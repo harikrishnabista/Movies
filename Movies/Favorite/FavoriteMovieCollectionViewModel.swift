@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 class FavoriteMovieCollectionViewModel: ObservableObject {
     
@@ -17,22 +18,39 @@ class FavoriteMovieCollectionViewModel: ObservableObject {
     ) {
         self.movieRepo = movieRepo
         self.favMovies = favMovies
+        
+        bindFavMovies()
+    }
+    
+    // MARK: - Public
+    
+    @Published var movies: [Movie] = []
+    private func publishMoviesList() {
+        movies = movieList
+    }
+    
+    func onFavoriteSelectionChanged(movie: Movie) {
+        favMovies.update(
+            isSelected: !movie.isFavorite,
+            movieId: movie.id
+        )
     }
     
     func onViewAppear() {
         loadMovies()
     }
     
-    private var mainData: MainData? {
-        didSet {
-            publishMoviesList()
-        }
-    }
+    // MARK: - Private
     
-    @Published var movies: [Movie] = []
+    private var cancellables = Set<AnyCancellable>()
     
-    private func publishMoviesList() {
-        movies = movieList
+    private func bindFavMovies() {
+        favMovies
+            .$list
+            .receive(on: RunLoop.main)
+            .sink { newList in
+                self.publishMoviesList()
+            }.store(in: &cancellables)
     }
     
     private var movieList: [Movie] {
@@ -51,14 +69,20 @@ class FavoriteMovieCollectionViewModel: ObservableObject {
             }
     }
     
-    func getMovieUrl(posterPath: String) -> URL? {
+    private func getMovieUrl(posterPath: String) -> URL? {
         let urlString = "https://image.tmdb.org/t/p/w500" + posterPath
         return URL(string: urlString)
     }
     
+    private var mainData: MainData? {
+        didSet {
+            publishMoviesList()
+        }
+    }
+    
     private func loadMovies() {
         
-        movieRepo.getMovies() { (result: Result<MainData, ApiError>) in
+        movieRepo.getMovies() { (result: Result<MainData, NetworkServiceError>) in
             
             DispatchQueue.main.async {
                 switch result {
@@ -71,14 +95,4 @@ class FavoriteMovieCollectionViewModel: ObservableObject {
             
         }
     }
-    
-    func onFavoriteSelectionChanged(movie: Movie) {
-        favMovies.update(
-            isSelected: !movie.isFavorite,
-            movieId: movie.id
-        )
-        
-        publishMoviesList()
-    }
-    
 }

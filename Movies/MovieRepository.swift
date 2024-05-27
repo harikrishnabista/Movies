@@ -9,9 +9,9 @@ import Foundation
 
 class MovieRepository {
     
-    private let apiCaller: ApiCaller
-    init(apiCaller: ApiCaller) {
-        self.apiCaller = apiCaller
+    private let networkService: NetworkService
+    init(networkService: NetworkService) {
+        self.networkService = networkService
     }
     
     let apiKey = "f130610f7b157c8e887136a6c6547353"
@@ -19,9 +19,10 @@ class MovieRepository {
     let apiUrl = "https://api.themoviedb.org/3/discover/movie?api_key=f130610f7b157c8e887136a6c6547353&sort_by=popularity.desc"
     
     func getMovies(
-        completion: @escaping (Result<MainData, ApiError>) -> Void
+        completion: @escaping (Result<MainData, NetworkServiceError>) -> Void
     ) {
         guard let url = URL(string: apiUrl) else { return }
-        apiCaller.getData(url: url, completion: completion)
+        
+        networkService.call(ApiConfiguration(urlPath: apiUrl), completion)
     }
 }

@@ -9,9 +9,7 @@ import Foundation
 
 class FavoriteMovies {
     
-    private var list: [String] = []
-    
-    @Published var count = 0
+    @Published var list: [String] = []
     
     func update(isSelected: Bool, movieId: String) {
         
@@ -26,8 +24,6 @@ class FavoriteMovies {
         } else {
             remove(movieId: movieId)
         }
-        
-        count = list.count
     }
     
     private func remove(movieId: String) {

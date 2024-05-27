@@ -17,7 +17,7 @@ struct ContentView: View {
             
             MovieCollectionView(
                 vm: MovieCollectionViewModel(
-                    movieRepo: MovieRepository(apiCaller: ApiCaller()),
+                    movieRepo: MovieRepository(networkService: NetworkService()),
                     favMovies: vm.favoriteMovies
                 )
             )
@@ -28,7 +28,7 @@ struct ContentView: View {
             
             FavoriteMovieCollectionView(
                 vm: FavoriteMovieCollectionViewModel(
-                    movieRepo: MovieRepository(apiCaller: ApiCaller()),
+                    movieRepo: MovieRepository(networkService: NetworkService()),
                     favMovies: vm.favoriteMovies
                 )
             )

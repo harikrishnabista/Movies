@@ -59,7 +59,7 @@ struct Movie : Identifiable {
 #Preview {
     MovieCollectionView(
         vm: MovieCollectionViewModel(
-            movieRepo: MovieRepository(apiCaller: ApiCaller()),
+            movieRepo: MovieRepository(networkService: NetworkService()),
             favMovies: FavoriteMovies()
         )
     )

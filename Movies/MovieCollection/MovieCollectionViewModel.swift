@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 class MovieCollectionViewModel: ObservableObject {
     
@@ -17,12 +18,25 @@ class MovieCollectionViewModel: ObservableObject {
     ) {
         self.movieRepo = movieRepo
         self.favMovies = favMovies
+        
+        bindFavMovies()
+    }
+    
+    private var cancellables = Set<AnyCancellable>()
+    
+    private func bindFavMovies() {
+        favMovies
+            .$list
+            .receive(on: RunLoop.main)
+            .sink { newList in
+                self.publishMoviesList()
+            }.store(in: &cancellables)
     }
     
     func onViewAppear() {
         loadMovies()
     }
-
+    
     private var mainData: MainData? {
         didSet {
             publishMoviesList()
@@ -45,7 +59,7 @@ class MovieCollectionViewModel: ObservableObject {
             return Movie(
                 id: movieId,
                 title: $0.title,
-                imgUrl: getMovieUrl(posterPath: $0.poster_path), 
+                imgUrl: getMovieUrl(posterPath: $0.poster_path),
                 isFavorite: favMovies.isFavorite(movieId: movieId)
             )
         }
@@ -58,8 +72,8 @@ class MovieCollectionViewModel: ObservableObject {
     
     private func loadMovies() {
         
-        movieRepo.getMovies() { (result: Result<MainData, ApiError>) in
-
+        movieRepo.getMovies() { (result: Result<MainData, NetworkServiceError>) in
+            
             DispatchQueue.main.async {
                 switch result {
                 case .success(let mainData):
@@ -77,10 +91,6 @@ class MovieCollectionViewModel: ObservableObject {
             isSelected: !movie.isFavorite,
             movieId: movie.id
         )
-        
-        publishMoviesList()
-        
-        print(movie.imgUrl)
     }
     
 }

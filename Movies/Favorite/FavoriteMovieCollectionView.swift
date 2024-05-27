@@ -60,7 +60,7 @@ struct FavoriteMovieCollectionView: View {
 #Preview {
     FavoriteMovieCollectionView(
         vm: FavoriteMovieCollectionViewModel(
-            movieRepo: MovieRepository(apiCaller: ApiCaller()),
+            movieRepo: MovieRepository(networkService: NetworkService()),
             favMovies: FavoriteMovies()
         )
     )

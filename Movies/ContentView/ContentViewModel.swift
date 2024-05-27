@@ -22,10 +22,10 @@ class ContentViewModel : ObservableObject {
     
     private func bindFavoriteMoviesCount() {
         favoriteMovies
-            .$count
+            .$list
             .receive(on: RunLoop.main)
-            .sink { newValue in
-                self.publishFavoriteMovieTitle(count: newValue)
+            .sink { newList in
+                self.publishFavoriteMovieTitle(count: newList.count)
             }.store(in: &cancellables)
     }
     
